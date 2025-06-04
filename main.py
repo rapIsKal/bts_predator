@@ -23,7 +23,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message or update.edited_message
     if not msg:
         return
-    message_text = msg.text or ""
+    message_text = msg.text or msg.caption or ""
+    logging.info(message_text)
     if contains_korean(message_text):
         try:
             member = await context.bot.get_chat_member(chat_id, user_id)
@@ -46,7 +47,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     BOT_TOKEN = os.getenv("TOKEN")
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_message))
     print("Bot is running...")
     app.run_polling()
 
