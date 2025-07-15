@@ -1,6 +1,7 @@
 import os
+import time
 
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, ChatPermissions
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 import re
 import logging
@@ -15,8 +16,19 @@ VOTE_THRESHOLD = 1
 votes = {}  # {voting_msg_id: {"reported_user_id": int, "ban": int, "noban": int, "voters": set()}}
 
 
-def contains_korean(text: str) -> bool:
-    return bool(re.search(r"[ㄱ-ㅎㅏ-ㅣ가-힣]", text))
+def transliterate(text: str):
+    converted_text = (
+        text.replace('a', 'а')
+            .replace('o', 'о').replace('p', 'р').replace('0', 'о').
+            replace('t', 'т').replace('b', 'б').replace('ο', 'о').
+            replace('ó', 'о').replace('6', 'б').replace('\u00ad', '').replace(' ', '')
+    )
+    return converted_text
+
+
+def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
+    return bool(re.search(r"[ㄱ-ㅎㅏ-ㅣ가-힣]", text)) or \
+           bool(re.search(r'\b(работа|подработка|заработок)\b', transliterate(text.lower())))
 
 
 async def detect_spam_report(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -110,11 +122,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     user_id = user.id
     msg = update.message or update.edited_message
-    if not msg:
+    if not msg or not (msg.reply_to_message and msg.reply_to_message.forward_from_chat):
+        logging.info('not a comment or empty comment')
         return
     message_text = msg.text or msg.caption or ""
     logging.info(message_text)
-    if contains_korean(message_text):
+    if contains_korean_and_arbeit_macht_frei(message_text):
         try:
             member = await context.bot.get_chat_member(chat_id, user_id)
             logging.info(f'member status: {member.status}')
@@ -126,8 +139,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if user.id == 1087968824:  # GroupAnonymousBot
                 logging.info(f"We don't ban GroupAnonymousBot")
                 return
-            await context.bot.ban_chat_member(chat_id, user_id)
-            logging.info(f"Banned user {user.username or user_id} for Korean message.")
+            await context.bot.restrict_chat_member(chat_id, user_id, permissions=ChatPermissions(can_send_messages=False),
+                  until_date=int(time.time()) + 30)
+            logging.info(f"Muted user {user.username or user_id} for Korean message or rabota stuff.")
 
         except Exception as e:
             logging.error(f"Error checking admin status or banning: {e}")
