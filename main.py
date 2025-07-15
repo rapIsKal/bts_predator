@@ -21,13 +21,18 @@ def transliterate(text: str):
         text.replace('a', 'а')
             .replace('o', 'о').replace('p', 'р').replace('0', 'о').
             replace('t', 'т').replace('b', 'б').replace('ο', 'о').
-            replace('ó', 'о').replace('6', 'б').replace('\u00ad', '').replace(' ', '')
+            replace('6', 'б').replace('\u00ad', '').replace(' ', '')
     )
     return converted_text
 
 
+def contains_non_cyrillic_or_latin(text: str) -> bool:
+    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9 !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
+    return not bool(re.match(allowed_pattern, text))
+
+
 def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
-    return bool(re.search(r"[ㄱ-ㅎㅏ-ㅣ가-힣]", text)) or \
+    return contains_non_cyrillic_or_latin(text) or \
            bool(re.search(r'\b(работа|подработка|заработок)\b', transliterate(text.lower())))
 
 
@@ -139,7 +144,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if user.id == 1087968824:  # GroupAnonymousBot
                 logging.info(f"We don't ban GroupAnonymousBot")
                 return
-            await context.bot.restrict_chat_member(chat_id, user_id, permissions=ChatPermissions(can_send_messages=False),
+            permissions = ChatPermissions(
+                **{"can_add_web_page_previews":False,
+                "can_change_info":False,
+                "can_invite_users":False,
+                "can_manage_topics":False,
+                "can_pin_messages":False,
+                "can_send_audios":True,
+                "can_send_documents":False,
+                "can_send_messages":False,
+                "can_send_other_messages":False,
+                "can_send_photos":False,
+                "can_send_polls":False,
+                "can_send_video_notes":False,
+                "can_send_videos":False,
+                "can_send_voice_notes":False}
+            )
+            await context.bot.restrict_chat_member(chat_id, user_id, permissions=permissions,
                   until_date=int(time.time()) + 30)
             logging.info(f"Muted user {user.username or user_id} for Korean message or rabota stuff.")
 
