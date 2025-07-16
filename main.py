@@ -27,7 +27,7 @@ def transliterate(text: str):
 
 
 def contains_non_cyrillic_or_latin(text: str) -> bool:
-    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9 !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
+    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
     return not bool(re.match(allowed_pattern, text))
 
 
