@@ -12,6 +12,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+SPAM_PATTERN = re.compile(
+    r'\b(работа\w*|подработ\w*|заработ\w*|зарабатыва\w*|темк\w*)\b'
+    r'|\b\d{1,3}(?:[.,]\d{3})?\s*(р|руб|rub|₽)\b',
+    re.IGNORECASE
+)
+
 def transliterate(text: str):
     converted_text = (
         text.replace('a', 'а')
@@ -23,13 +29,13 @@ def transliterate(text: str):
 
 
 def contains_non_cyrillic_or_latin(text: str) -> bool:
-    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
+    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
     return not bool(re.match(allowed_pattern, text))
 
 
 def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
     return contains_non_cyrillic_or_latin(text) or \
-           bool(re.search(r'\b(работа|подработка|заработок|зарабатывать|темк)\b', transliterate(text.lower())))
+           bool(SPAM_PATTERN.search(transliterate(text.lower())))
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
