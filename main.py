@@ -13,10 +13,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SPAM_PATTERN = re.compile(
-    r'\b(работа\w*|подработ\w*|заработ\w*|зарабатыва\w*|темк\w*)\b'
-    r'|\b\d{1,3}(?:[.,]\d{3})?\s*(р|руб|rub|₽)\b',
+    r"(?:\d+[.,]?\d*\s*(?:р|руб|rub|₽|k)|\d+\s*(?:тыс|k)\s*(?:р|руб|₽)?)",
     re.IGNORECASE
 )
+
 
 def transliterate(text: str):
     converted_text = (
@@ -28,14 +28,27 @@ def transliterate(text: str):
     return converted_text
 
 
+SPAM_WORDS = [
+    "подработ",
+    "заработ",
+    "работа",
+    "зарабатыва",
+]
+
+
 def contains_non_cyrillic_or_latin(text: str) -> bool:
     allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
     return not bool(re.match(allowed_pattern, text))
 
 
+def rub_filter(text:str) -> bool:
+    return bool(SPAM_PATTERN.search(text))
+
+
 def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
     return contains_non_cyrillic_or_latin(text) or \
-           bool(SPAM_PATTERN.search(transliterate(text.lower())))
+           rub_filter(text.lower()) \
+           or any([x in transliterate(text.lower()) for x in SPAM_WORDS])
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
