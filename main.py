@@ -43,7 +43,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     user_id = user.id
     msg = update.message or update.edited_message
-    if not msg or not (msg.reply_to_message and msg.reply_to_message.forward_from_chat):
+    if not msg or not (msg.reply_to_message and msg.reply_to_message.forward_origin):
         logging.info('not a comment or empty comment')
         return
     message_text = msg.text or msg.caption or ""
