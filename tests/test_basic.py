@@ -16,5 +16,6 @@ from main import contains_korean_and_arbeit_macht_frei
 def test_spam_detected(text):
     assert contains_korean_and_arbeit_macht_frei(text) is True
 
+
 def test_dummy():
-    assert 2+2 == 5
+    assert 2+2 == 4
