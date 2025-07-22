@@ -29,10 +29,8 @@ def transliterate(text: str):
 
 
 SPAM_WORDS = [
-    "подработ",
-    "заработ",
-    "работа",
-    "зарабатыва",
+    "темк",
+    "зарабат",
 ]
 
 
@@ -45,10 +43,15 @@ def rub_filter(text:str) -> bool:
     return bool(SPAM_PATTERN.search(text))
 
 
+def arbeit_spam_filter(text: str) -> bool:
+    return ("работ" in text and not any([x in text for x in ["проработ", "переработ", "разработ"]])) or \
+           any([x in text for x in SPAM_WORDS])
+
+
 def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
     return contains_non_cyrillic_or_latin(text) or \
            rub_filter(text.lower()) \
-           or any([x in transliterate(text.lower()) for x in SPAM_WORDS])
+           or arbeit_spam_filter(transliterate(text.lower()))
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
