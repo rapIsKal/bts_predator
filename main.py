@@ -1,7 +1,6 @@
 import os
-import time
 
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, ChatPermissions
+from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 import re
 import logging
@@ -75,24 +74,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logging.info(f"We don't ban GroupAnonymousBot")
                 return
             await context.bot.delete_message(chat_id, update.message.message_id)
-            permissions = ChatPermissions(
-                **{"can_add_web_page_previews":False,
-                "can_change_info":False,
-                "can_invite_users":False,
-                "can_manage_topics":False,
-                "can_pin_messages":False,
-                "can_send_audios":True,
-                "can_send_documents":False,
-                "can_send_messages":False,
-                "can_send_other_messages":False,
-                "can_send_photos":False,
-                "can_send_polls":False,
-                "can_send_video_notes":False,
-                "can_send_videos":False,
-                "can_send_voice_notes":False}
-            )
-            await context.bot.restrict_chat_member(chat_id, user_id, permissions=permissions,
-                  until_date=int(time.time()) + 60)
+            await context.bot.ban_chat_member(chat_id, user_id)
             logging.info(f"Muted user {user.username or user_id} for Korean message or rabota stuff.")
 
         except Exception as e:
