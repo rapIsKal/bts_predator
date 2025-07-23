@@ -73,7 +73,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if user.id == 1087968824:  # GroupAnonymousBot
                 logging.info(f"We don't ban GroupAnonymousBot")
                 return
-            await context.bot.delete_message(chat_id, update.message.message_id)
+            try:
+                await context.bot.delete_message(chat_id, update.message.message_id)
+            except Exception as e:
+                logging.info(f"Error deleting message {update.message.message_id}: {e}")
             await context.bot.ban_chat_member(chat_id, user_id)
             logging.info(f"Muted user {user.username or user_id} for Korean message or rabota stuff.")
 
