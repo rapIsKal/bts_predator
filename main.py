@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from mass_spam_detection import detect_mass_spam
+
 SPAM_PATTERN = re.compile(
     r"(?:\d+[.,]?\d*\s*(?:р|руб|rub|₽|k)|\d+\s*(?:тыс|k)\s*(?:р|руб|₽)?)",
     re.IGNORECASE
@@ -61,9 +63,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not msg or not (msg.reply_to_message and msg.reply_to_message.forward_origin):
         logging.info('not a comment or empty comment')
         return
+    post_id = msg.reply_to_message.id # NOTE: above should trigger only on direct post replies
     message_text = msg.text or msg.caption or ""
     logging.info(message_text)
-    if contains_korean_and_arbeit_macht_frei(message_text):
+    if contains_korean_and_arbeit_macht_frei(message_text) or detect_mass_spam(message_text, user_id, post_id):
         try:
             member = await context.bot.get_chat_member(chat_id, user_id)
             logging.info(f'member status: {member.status}')
