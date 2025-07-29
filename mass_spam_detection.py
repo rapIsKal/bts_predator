@@ -8,8 +8,9 @@
 # - each user_id must be returned exactly once in the time span
 # - use global state
 import time
+import os
 
-TIME_SPAN_SEC = 5.0
+TIME_SPAN_SEC = os.getenv("MASS_SPAM_TIME_SPAN") or 5.0
 
 # Global state
 message_log = []  # List of tuples: (timestamp, user_id, post_id, message)
