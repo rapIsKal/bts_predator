@@ -17,7 +17,8 @@ from main import contains_korean_and_arbeit_macht_frei
     ("проработанный", False),
     ("Хочешь много денег? 💵 💰 🫰", True),
     ("Хочешь много денег? 💵", True),
-    ("Хочешь много денег? 🫰", True)
+    ("Хочешь много денег? 🫰", True),
+    ("Rab0та сделана, всё молодцы", True)
 ])
 def test_spam_detected(text, result):
     assert contains_korean_and_arbeit_macht_frei(text) is result

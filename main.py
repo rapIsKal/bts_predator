@@ -34,7 +34,7 @@ def transliterate(text: str):
         text.replace('a', 'а')
             .replace('o', 'о').replace('p', 'р').replace('0', 'о').
             replace('t', 'т').replace('b', 'б').replace('ο', 'о').
-            replace('6', 'б').replace('\u00ad', '').replace(' ', '')
+            replace('6', 'б').replace('\u00ad', '').replace(' ', '').replace('r', 'р')
     )
     return converted_text
 
@@ -62,8 +62,6 @@ def contains_forbidden_emoji(text: str) -> bool:
 def contains_non_cyrillic_or_latin(text: str) -> bool:
     allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
     text_without_emojis = EMOJI_REGEX.sub('', text)
-    emoji_count = len(EMOJI_REGEX.findall(text))
-    print(emoji_count)
     return not bool(re.match(allowed_pattern, text_without_emojis)) or contains_forbidden_emoji(text)
 
 
