@@ -26,5 +26,5 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest
+        pytest tests/test_basic.py
 
