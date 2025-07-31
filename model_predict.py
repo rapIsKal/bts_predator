@@ -27,4 +27,3 @@ if __name__ == "__main__":
     print(f"Input: {example_text}")
     print(f"Predicted label: {label} ({'SPAM' if label == 1 else 'NOT SPAM'})")
     print(f"Confidence: {score:.2f}")
-

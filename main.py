@@ -1,13 +1,13 @@
-import os
-
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-import re
 import logging
-
-logging.basicConfig(level=logging.INFO)
+import os
+import re
 
 from dotenv import load_dotenv
+from telegram import Update
+from telegram.ext import (ApplicationBuilder, ContextTypes, MessageHandler,
+                          filters)
+
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -72,8 +72,8 @@ def rub_filter(text:str) -> bool:
 
 
 def arbeit_spam_filter(text: str) -> bool:
-    return ("работ" in text and not any([x in text for x in ["проработ", "переработ", "разработ"]])) or \
-           any([x in text for x in SPAM_WORDS])
+    return ("работ" in text and not any(x in text for x in ["проработ", "переработ", "разработ"])) or \
+           any(x in text for x in SPAM_WORDS)
 
 
 def contains_korean_and_arbeit_macht_frei(text: str) -> bool:
@@ -95,22 +95,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if contains_korean_and_arbeit_macht_frei(message_text):
         try:
             member = await context.bot.get_chat_member(chat_id, user_id)
-            logging.info(f'member status: {member.status}')
+            logging.info('member status: %s', member.status)
             if member.status in ['administrator', 'creator', 'member']:
-                logging.info(f"Skipped banning chat member: {user.username or user_id}")
+                logging.info("Skipped banning chat member: %s", user.username or user_id)
                 return
             if user.id == 1087968824:  # GroupAnonymousBot
-                logging.info(f"We don't ban GroupAnonymousBot")
+                logging.info("We don't ban GroupAnonymousBot")
                 return
             try:
                 await context.bot.delete_message(chat_id, update.message.message_id)
             except Exception as e:
-                logging.info(f"Error deleting message {update.message.message_id}: {e}")
+                logging.info("Error deleting message %s: %s", update.message.message_id, e)
             await context.bot.ban_chat_member(chat_id, user_id)
-            logging.info(f"Muted user {user.username or user_id} for Korean message or rabota stuff.")
+            logging.info("Muted user  %s for Korean message or rabota stuff", user.username or user_id)
 
         except Exception as e:
-            logging.error(f"Error checking admin status or banning: {e}")
+            logging.error("Error checking admin status or banning: %s", e)
 
 
 def main():
