@@ -16,6 +16,18 @@ SPAM_PATTERN = re.compile(
     re.IGNORECASE
 )
 
+EMOJI_REGEX = re.compile(
+    r'[\U0001F600-\U0001F64F' 
+    r'\U0001F300-\U0001F5FF'  
+    r'\U0001F680-\U0001F6FF'  
+    r'\U0001F1E0-\U0001F1FF'  
+    r'\U00002700-\U000027BF' 
+    r'\U0001F900-\U0001F9FF' 
+    r'\U00002600-\U000026FF'  
+    r']',
+    flags=re.UNICODE
+)
+
 
 def transliterate(text: str):
     converted_text = (
@@ -32,10 +44,27 @@ SPAM_WORDS = [
     "зарабат",
 ]
 
+FORBIDDEN_MONEY_EMOJIS = {
+    "💰",
+    "💴",
+    "💵",
+    "💶",
+    "💷",
+    "💸",
+    "🪙",
+}
+
+
+def contains_forbidden_emoji(text: str) -> bool:
+    return any(char in FORBIDDEN_MONEY_EMOJIS for char in text)
+
 
 def contains_non_cyrillic_or_latin(text: str) -> bool:
     allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—]*$'
-    return not bool(re.match(allowed_pattern, text))
+    text_without_emojis = EMOJI_REGEX.sub('', text)
+    emoji_count = len(EMOJI_REGEX.findall(text))
+    print(emoji_count)
+    return not bool(re.match(allowed_pattern, text_without_emojis)) or contains_forbidden_emoji(text)
 
 
 def rub_filter(text:str) -> bool:

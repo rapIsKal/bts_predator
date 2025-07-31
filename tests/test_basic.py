@@ -2,6 +2,7 @@ import pytest
 
 from main import contains_korean_and_arbeit_macht_frei
 
+
 @pytest.mark.parametrize(("text", "result"), [
     ("ищу людей на подработку", True),
     ("заработай 10.000руб", True),
@@ -13,9 +14,14 @@ from main import contains_korean_and_arbeit_macht_frei
     ("10.000 руб.", True),
     ("10000 руб", True),
     ("Ищешь работу го в ЛС", True),
-    ("проработанный", False)
+    ("проработанный", False),
+    ("Хочешь много денег? 💵 💰 🫰", True),
+    ("Хочешь много денег? 💵", True),
+    ("Хочешь много денег? 🫰", True)
 ])
 def test_spam_detected(text, result):
     assert contains_korean_and_arbeit_macht_frei(text) is result
+
+
 
 
