@@ -1,0 +1,15 @@
+# IDE settings
+.idea
+
+# Git repo data
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Other junk you don’t want in the image
+.env
+*.log
