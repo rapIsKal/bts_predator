@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 SPAM_PATTERN = re.compile(
-    r"(?:\d+[.,]?\d*\s*(?:р|руб|rub|₽|k)|\d+\s*(?:тыс|k)\s*(?:р|руб|₽)?)",
+    r"(?:\d+[.,]?\d*\s*(?:р($|\.|\s)|руб|rub|₽|k)|\d+\s*(?:тыс|k)\s*(?:р($|\.|\s)|руб|₽)?)",
     re.IGNORECASE
 )
 
@@ -60,7 +60,7 @@ def contains_forbidden_emoji(text: str) -> bool:
 
 
 def contains_non_cyrillic_or_latin(text: str) -> bool:
-    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—«»]*$'
+    allowed_pattern = r'^[a-zA-Zа-яА-ЯёЁ0-9\t\n !"#$%&\'()*+,\-./:;<=>?@[\\\]^_`{|}~—«»“”]*$'
     text_without_emojis = EMOJI_REGEX.sub('', text)
     text_without_emojis = re.sub(r'[\uFE0F\uFE0E]', '', text_without_emojis)  # variation selectors
     return not bool(re.match(allowed_pattern, text_without_emojis)) or contains_forbidden_emoji(text)
