@@ -71,7 +71,7 @@ def rub_filter(text:str) -> bool:
 
 
 def arbeit_spam_filter(text: str) -> bool:
-    return ("работ" in text and not any(x in text for x in ["проработ", "переработ", "разработ"])) or \
+    return ("работ" in text and not any(x in text for x in ["проработ", "переработ", "разработ", "безработ"])) or \
            any(x in text for x in SPAM_WORDS)
 
 
